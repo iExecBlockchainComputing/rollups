@@ -67,4 +67,14 @@ contract ERC20{
     function allowance(address _owner, address _spender) public view returns (uint256 remaining) {
         return allowed[_owner][_spender];
     }
+    function _mint(address _owner, uint256 _value) internal {
+        balances[_owner] += _value;
+    } 
+    function _burn(address _owner, uint256 _value) internal {
+        balances[_owner] -= _value;
+    }
+    function _transfer(address _alice, address _bob,  uint256 _value) internal {
+        _burn(_alice, _value);
+        _mint(_bob, _value);
+    }
 }
