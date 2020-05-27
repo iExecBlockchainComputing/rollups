@@ -18,7 +18,7 @@ describe('ERC20 smart contract', () => {
   })
 
   //ADD TO SUPPORT OVM
-  after(() => {provider.closeOVM()}) 
+  after(() => {provider.closeOVM()})
 
   // parameters to use for our test coin
   const COIN_NAME = 'OVM Test Coin'

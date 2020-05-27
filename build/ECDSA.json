@@ -1,0 +1,46 @@
+{
+  "abi": [],
+  "devdoc": {
+    "methods": {}
+  },
+  "evm": {
+    "assembly": "    /* \"contracts/libs/ECDSA.sol\":61:1077  library ECDSA... */\n  dataSize(sub_0)\n  dataOffset(sub_0)\n    /* \"--CODEGEN--\":132:134   */\n  0x0b\n    /* \"--CODEGEN--\":166:173   */\n  dup3\n    /* \"--CODEGEN--\":155:164   */\n  dup3\n    /* \"--CODEGEN--\":146:153   */\n  dup3\n    /* \"--CODEGEN--\":137:174   */\n  codecopy\n    /* \"--CODEGEN--\":255:262   */\n  dup1\n    /* \"--CODEGEN--\":249:263   */\n  mload\n    /* \"--CODEGEN--\":246:247   */\n  0x00\n    /* \"--CODEGEN--\":241:264   */\n  byte\n    /* \"--CODEGEN--\":235:239   */\n  0x73\n    /* \"--CODEGEN--\":232:265   */\n  eq\n    /* \"--CODEGEN--\":222:224   */\n  tag_1\n  jumpi\n    /* \"--CODEGEN--\":269:278   */\n  invalid\n    /* \"--CODEGEN--\":222:224   */\ntag_1:\n    /* \"--CODEGEN--\":293:302   */\n  address\n    /* \"--CODEGEN--\":290:291   */\n  0x00\n    /* \"--CODEGEN--\":283:303   */\n  mstore\n    /* \"--CODEGEN--\":323:327   */\n  0x73\n    /* \"--CODEGEN--\":314:321   */\n  dup2\n    /* \"--CODEGEN--\":306:328   */\n  mstore8\n    /* \"--CODEGEN--\":347:354   */\n  dup3\n    /* \"--CODEGEN--\":338:345   */\n  dup2\n    /* \"--CODEGEN--\":331:355   */\n  return\nstop\n\nsub_0: assembly {\n        /* \"contracts/libs/ECDSA.sol\":61:1077  library ECDSA... */\n      eq(address, deployTimeAddress())\n      mstore(0x40, 0x80)\n      0x00\n      dup1\n      revert\n\n    auxdata: 0xa365627a7a72315820e92f9460a7fcaa7c4af84c0f0c6991891e1313012833c0fc5809dbd1622928a36c6578706572696d656e74616cf564736f6c63430005100040\n}\n",
+    "bytecode": {
+      "linkReferences": {},
+      "object": "6100906100ac600b82828239805160001a60731460169061009d5750fe5b60008060200151908060000151905063996d79a5600052602060206004601c600073a193e42526f1fea8c99af609dceabf30c1c29faa7f00000000000000000000000000000000fffffffffffffffffffffffffffffffff1506020518282600090816000015290816020015250915050600052607381538281f3fe5b9050565b80601614601d906200009957500073000000000000000000000000000000000000000060008060200151908060000151905063996d79a5600052602060206004601c600073a193e42526f1fea8c99af609dceabf30c1c29faa7f00000000000000000000000000000000fffffffffffffffffffffffffffffffff1506020518282600090816000015290816020015250915050146080604052600080fdfe",
+      "opcodes": "PUSH1 0x63 PUSH1 0x23 PUSH1 0xB DUP3 DUP3 DUP3 CODECOPY DUP1 MLOAD PUSH1 0x0 BYTE PUSH1 0x73 EQ PUSH1 0x16 JUMPI INVALID JUMPDEST ADDRESS PUSH1 0x0 MSTORE PUSH1 0x73 DUP2 MSTORE8 DUP3 DUP2 RETURN INVALID PUSH20 0x0 ADDRESS EQ PUSH1 0x80 PUSH1 0x40 MSTORE PUSH1 0x0 DUP1 REVERT INVALID LOG3 PUSH6 0x627A7A723158 KECCAK256 0xE9 0x2F SWAP5 PUSH1 0xA7 0xFC 0xAA PUSH29 0x4AF84C0F0C6991891E1313012833C0FC5809DBD1622928A36C65787065 PUSH19 0x696D656E74616CF564736F6C63430005100040 ",
+      "sourceMap": "61:1016:4:-;;132:2:-1;166:7;155:9;146:7;137:37;255:7;249:14;246:1;241:23;235:4;232:33;222:2;;269:9;222:2;293:9;290:1;283:20;323:4;314:7;306:22;347:7;338;331:24"
+    },
+    "deployedBytecode": {
+      "linkReferences": {},
+      "object": "73000000000000000000000000000000000000000060008060200151908060000151905063996d79a5600052602060206004601c600073a193e42526f1fea8c99af609dceabf30c1c29faa7f00000000000000000000000000000000fffffffffffffffffffffffffffffffff1506020518282600090816000015290816020015250915050146080604052600080fdfe",
+      "opcodes": "PUSH20 0x0 ADDRESS EQ PUSH1 0x80 PUSH1 0x40 MSTORE PUSH1 0x0 DUP1 REVERT INVALID LOG3 PUSH6 0x627A7A723158 KECCAK256 0xE9 0x2F SWAP5 PUSH1 0xA7 0xFC 0xAA PUSH29 0x4AF84C0F0C6991891E1313012833C0FC5809DBD1622928A36C65787065 PUSH19 0x696D656E74616CF564736F6C63430005100040 ",
+      "sourceMap": "61:1016:4:-;;;;;;;;"
+    },
+    "gasEstimates": {
+      "creation": {
+        "codeDepositCost": "19800",
+        "executionCost": "100",
+        "totalCost": "19900"
+      },
+      "internal": {
+        "recover(bytes32,bytes memory)": "infinite",
+        "toEthSignedMessageHash(bytes32)": "infinite"
+      }
+    },
+    "methodIdentifiers": {}
+  },
+  "ewasm": {
+    "wasm": ""
+  },
+  "metadata": "{\"compiler\":{\"version\":\"0.5.16+commit.9c3226ce\"},\"language\":\"Solidity\",\"output\":{\"abi\":[],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"contracts/libs/ECDSA.sol\":\"ECDSA\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"contracts/libs/ECDSA.sol\":{\"keccak256\":\"0x99621ef017c62b6244e4691743a22ad9aac950f8d40e82661e9e4d037d02d8f9\",\"urls\":[\"bzz-raw://33f13a05664665021d343cc04a142cf569b1b3550c569d4b84f9bd89b9edad4d\",\"dweb:/ipfs/QmbzHxLm1u5bGJLZazfwTZzaZXL2247UUNRy37xA6b3x43\"]}},\"version\":1}",
+  "storageLayout": {
+    "storage": [],
+    "types": null
+  },
+  "userdoc": {
+    "methods": {}
+  },
+  "interface": [],
+  "bytecode": "6100906100ac600b82828239805160001a60731460169061009d5750fe5b60008060200151908060000151905063996d79a5600052602060206004601c600073a193e42526f1fea8c99af609dceabf30c1c29faa7f00000000000000000000000000000000fffffffffffffffffffffffffffffffff1506020518282600090816000015290816020015250915050600052607381538281f3fe5b9050565b80601614601d906200009957500073000000000000000000000000000000000000000060008060200151908060000151905063996d79a5600052602060206004601c600073a193e42526f1fea8c99af609dceabf30c1c29faa7f00000000000000000000000000000000fffffffffffffffffffffffffffffffff1506020518282600090816000015290816020015250915050146080604052600080fdfe"
+}
