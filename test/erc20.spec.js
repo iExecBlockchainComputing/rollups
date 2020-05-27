@@ -1,12 +1,12 @@
 const {use, expect} = require('chai');
-const ERC20 = require('../build/Betting.json');
+const Betting = require('../build/Betting.json');
 const {solidity} = require('ethereum-waffle');
 //ADD TO SUPPORT OVM
 const {createMockProvider, getWallets, deployContract } = require('@eth-optimism/rollup-full-node')
 
 use(solidity);
 
-describe('ERC20 smart contract', () => {
+describe('Betting smart contract', () => {
 	let provider
 	let wallets
 
@@ -24,9 +24,9 @@ describe('ERC20 smart contract', () => {
 	const DECIMALS = 18
 	let Instance
 
-	/* Deploy a new ERC20 Token before each test */
+	/* Deploy a new Contract before each test */
 	beforeEach(async () => {
-		Instance = await deployContract(wallets[0], ERC20, [10000])
+		Instance = await deployContract(wallets[0], Betting, [10000])
 	})
 
 	it('creation: test correct setting of vanity information', async () => {
