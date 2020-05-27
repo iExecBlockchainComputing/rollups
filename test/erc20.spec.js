@@ -1,5 +1,5 @@
 const {use, expect} = require('chai');
-const ERC20 = require('../build/ERC20.json');
+const ERC20 = require('../build/Betting.json');
 const {solidity} = require('ethereum-waffle');
 //ADD TO SUPPORT OVM
 const {createMockProvider, getWallets, deployContract } = require('@eth-optimism/rollup-full-node')
@@ -7,51 +7,43 @@ const {createMockProvider, getWallets, deployContract } = require('@eth-optimism
 use(solidity);
 
 describe('ERC20 smart contract', () => {
-  let provider
-  let wallet, walletTo
+	let provider
+	let wallets
 
-  before(async () => {
-    provider = await createMockProvider()
-    const wallets = getWallets(provider)
-    wallet = wallets[0]
-    walletTo = wallets[1]
-  })
+	before(async () => {
+		provider = await createMockProvider()
+		wallets  = getWallets(provider)
+	})
 
-  //ADD TO SUPPORT OVM
-  after(() => {provider.closeOVM()})
+	//ADD TO SUPPORT OVM
+	after(() => {provider.closeOVM()})
 
-  // parameters to use for our test coin
-  const COIN_NAME = 'OVM Test Coin'
-  const TICKER = 'OVM'
-  const NUM_DECIMALS = 1
-  let ERC20Token
+	// parameters to use for our test coin
+	const NAME     = 'Layer2 Betting'
+	const SYMBOL   = 'L2B'
+	const DECIMALS = 18
+	let Instance
 
-  /* Deploy a new ERC20 Token before each test */
-  beforeEach(async () => {
-    ERC20Token = await deployContract(wallet, ERC20, [10000, COIN_NAME, NUM_DECIMALS, TICKER])
-  })
+	/* Deploy a new ERC20 Token before each test */
+	beforeEach(async () => {
+		Instance = await deployContract(wallets[0], ERC20, [10000])
+	})
 
-  it('creation: should create an initial balance of 10000 for the creator', async () => {
-    const balance = await ERC20Token.balanceOf(wallet.address)
-    expect(balance.toNumber()).to.equal(10000);
-  });
+	it('creation: test correct setting of vanity information', async () => {
+		expect(await Instance.name()       ).to.equal(NAME);
+		expect(await Instance.symbol()     ).to.equal(SYMBOL);
+		expect(await Instance.decimals()   ).to.equal(DECIMALS);
+		expect(await Instance.totalSupply()).to.equal(10000);
+	});
 
-  it('creation: test correct setting of vanity information', async () => {
-    const name = await ERC20Token.name();
-    expect(name).to.equal(COIN_NAME);
+	it('creation: should create an initial balance of 10000 for the creator', async () => {
+		expect(await Instance.balanceOf(wallets[0].address)).to.equal(10000);
+	});
 
-    const decimals = await ERC20Token.decimals();
-    expect(decimals).to.equal(NUM_DECIMALS);
+	it('transfers: should transfer 1000 with wallet having 10000', async () => {
+		await Instance.transfer(wallets[1].address, 1000);
 
-    const symbol = await ERC20Token.symbol();
-    expect(symbol).to.equal(TICKER);
-  });
-
-  it('transfers: should transfer 10000 to walletTo with wallet having 10000', async () => {
-    await ERC20Token.transfer(walletTo.address, 10000);
-    const walletToBalance = await ERC20Token.balanceOf(walletTo.address);
-    const walletFromBalance = await ERC20Token.balanceOf(wallet.address);
-    expect(walletToBalance.toNumber()).to.equal(10000);
-    expect(walletFromBalance.toNumber()).to.equal(0);
-  });
+		expect(await Instance.balanceOf(wallets[0].address)).to.equal(9000);
+		expect(await Instance.balanceOf(wallets[1].address)).to.equal(1000);
+	});
 });

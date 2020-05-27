@@ -1,7 +1,7 @@
 pragma solidity ^0.5.16;
 pragma experimental ABIEncoderV2;
 
-import './libs/ECDSA.sol';
+import "@openzeppelin/contracts/cryptography/ECDSA.sol";
 import './Escrow.sol';
 
 
@@ -34,6 +34,12 @@ contract Betting is Escrow
 
 	event GameOn(address indexed player, bytes32 indexed orderid, bytes32 gameid);
 	event Reveal(bytes32 indexed gameid, address player);
+
+	constructor(uint256 initialBalance)
+	public ERC20Detailed("Layer2 Betting", "L2B", 18)
+	{
+		_mint(_msgSender(), initialBalance); //testing only
+	}
 
 	function matchOrders(Order memory o1, Order memory o2)
 	public

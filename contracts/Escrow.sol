@@ -1,32 +1,29 @@
 pragma solidity ^0.5.16;
 pragma experimental ABIEncoderV2;
 
-import './ERC20.sol';
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/ERC20Detailed.sol";
 
 
-contract Escrow is ERC20
+contract Escrow is ERC20, ERC20Detailed
 {
-	constructor()
-	public ERC20(0, 'escrow', 18, 'escrow')
-	{}
-
 	function receive()
 	external payable
 	{
-		_mint(msg.sender, msg.value);
+		_mint(_msgSender(), msg.value);
 	}
 
 	function deposit()
 	external payable
 	{
-		_mint(msg.sender, msg.value);
+		_mint(_msgSender(), msg.value);
 	}
 
 	function withdraw(uint256 amount)
 	external
 	{
-		_burn(msg.sender, amount);
-		(bool success, bytes memory returndata) = msg.sender.call.value(amount)('');
+		_burn(_msgSender(), amount);
+		(bool success, bytes memory returndata) = _msgSender().call.value(amount)('');
 		require(success, string(returndata));
 	}
 
