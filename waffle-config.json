@@ -1,8 +1,8 @@
 {
-  "sourcesPath": "./contracts",
-  "targetPath": "./build",
-  "npmPath": "./node_modules",
-  "solcVersion": "./node_modules/@eth-optimism/solc-transpiler",
+  "sourceDirectory": "./contracts",
+  "outputDirectory": "./build",
+  "nodeModulesDirectory": "./node_modules",
+  "compilerVersion": "./node_modules/@eth-optimism/solc-transpiler",
   "compilerOptions": {
     "outputSelection": {
       "*": {

@@ -29,9 +29,9 @@
     "@eth-optimism/rollup-full-node": "latest",
     "@eth-optimism/solc-transpiler": "latest",
     "@openzeppelin/contracts": "2.5.1",
-    "ethereum-waffle": "^2.0.12",
-    "mocha": "^7.0.1",
-    "rimraf": "^2.6.3"
+    "ethereum-waffle": "^2.5.1",
+    "mocha": "^7.2.0",
+    "rimraf": "^3.0.2"
   },
   "publishConfig": {
     "access": "public"
