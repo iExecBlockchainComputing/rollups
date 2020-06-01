@@ -1,8 +1,8 @@
-const {use, expect} = require('chai');
 const Betting = require('../build/Betting.json');
-const {solidity} = require('ethereum-waffle');
-//ADD TO SUPPORT OVM
-const {createMockProvider, getWallets, deployContract } = require('@eth-optimism/rollup-full-node')
+
+const { use, expect } = require('chai');
+const { solidity } = require('ethereum-waffle');
+const { createMockProvider, getWallets, deployContract } = require('@eth-optimism/rollup-full-node')
 
 use(solidity);
 
@@ -27,9 +27,9 @@ describe('Betting smart contract', () => {
 	// Tests
 
 	it('creation: test correct setting of vanity information', async () => {
-		expect(await Instance.name()       ).to.equal('Layer2 Betting')
-		expect(await Instance.symbol()     ).to.equal('L2B')
-		expect(await Instance.decimals()   ).to.equal(18)
+		expect(await Instance.name()).to.equal('Layer2 Betting')
+		expect(await Instance.symbol()).to.equal('L2B')
+		expect(await Instance.decimals()).to.equal(18)
 	});
 
 	it('airdrop: should mint tokens', async () => {
