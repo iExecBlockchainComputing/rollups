@@ -30,6 +30,7 @@
     "@eth-optimism/solc-transpiler": "latest",
     "@openzeppelin/contracts": "2.5.1",
     "ethereum-waffle": "^2.5.1",
+    "husky": "^4.2.5",
     "mocha": "^7.2.0",
     "rimraf": "^3.0.2"
   },
