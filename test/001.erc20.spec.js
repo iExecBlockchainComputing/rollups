@@ -1,8 +1,8 @@
 const Betting = require('../build/Betting.json');
 
 const { use, expect } = require('chai');
-const { solidity } = require('ethereum-waffle');
-const { createMockProvider, getWallets, deployContract } = require('@eth-optimism/rollup-full-node')
+const { solidity, deployContract } = require('ethereum-waffle');
+const { getProvider } = require('./setup')
 
 use(solidity);
 
@@ -14,11 +14,9 @@ describe('Betting smart contract', () => {
 	// Setup
 
 	before(async () => {
-		provider = await createMockProvider()
-		wallets  = getWallets(provider)
+		provider = await getProvider()
+		wallets  = provider.getWallets()
 	})
-
-	after(() => { provider.closeOVM() })
 
 	beforeEach(async () => {
 		Instance = await deployContract(wallets[0], Betting, [])

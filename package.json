@@ -1,40 +1,30 @@
 {
-  "name": "@eth-optimism/ERC20-Example",
-  "version": "0.0.1-alpha.0",
-  "description": "Basic example of how to test a basic token contract on the OVM",
+  "name": "@iexec/rollups",
+  "version": "0.0.1",
+  "author": "Amxx",
+  "description": "iExec on optimistic roollups",
+  "license": "MIT",
   "scripts": {
     "clean": "rimraf build",
-    "test": "mkdir -p build && DEBUG=info*,error*,warn* waffle waffle-config.json && DEBUG=info*,error*,warn* mocha 'test/*.spec.js' --timeout 10000",
-    "all": "yarn clean && yarn test"
+    "build:evm": "mkdir -p build && waffle waffle-config-evm.json",
+    "test:evm": "yarn build:evm && MODE=EVM mocha 'test/*.spec.js' --timeout 10000",
+    "all:evm": "yarn clean && yarn test:evm",
+    "build:ovm": "mkdir -p build && DEBUG=info*,error*,warn* waffle waffle-config-ovm.json",
+    "test:ovm": "yarn build:ovm && MODE=OVM DEBUG=info*,warn* mocha 'test/*.spec.js' --timeout 50000",
+    "all:ovm": "yarn clean && yarn test:ovm"
   },
-  "keywords": [
-    "optimism",
-    "rollup",
-    "optimistic",
-    "ethereum",
-    "virtual",
-    "machine",
-    "OVM",
-    "metacoin",
-    "tutorial"
-  ],
-  "homepage": "https://github.com/ethereum-optimism/ERC20-Example#readme",
-  "license": "MIT",
-  "author": "Optimism PBC",
+  "homepage": "https://github.com/iExecBlockchainComputing/rollups-internship#readme",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ethereum-optimism/ERC20-Example.git"
+    "url": "https://github.com/iExecBlockchainComputing/rollups-internship.git"
   },
   "dependencies": {
-    "@eth-optimism/rollup-full-node": "latest",
-    "@eth-optimism/solc-transpiler": "latest",
+    "@eth-optimism/rollup-full-node": "^0.0.1-alpha.28",
+    "@eth-optimism/solc": "0.5.16-alpha.0",
     "@openzeppelin/contracts": "2.5.1",
-    "ethereum-waffle": "^2.5.1",
-    "husky": "^4.2.5",
-    "mocha": "^7.2.0",
-    "rimraf": "^3.0.2"
-  },
-  "publishConfig": {
-    "access": "public"
+    "ethereum-waffle": "^2.5.0",
+    "solc": "0.5.16",
+    "mocha": "^7.0.1",
+    "rimraf": "^2.6.3"
   }
 }
