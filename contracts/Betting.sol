@@ -50,9 +50,8 @@ contract Betting is EscrowDev
 		bytes32 orderid2 = hashOrder(o2);
 		bytes32 gameid   = keccak256(abi.encodePacked(orderid1, orderid2));
 
-		// ecrecover returns address(0)
-		// require(o1.player == orderid1.toEthSignedMessageHash().recover(o1.sign), "invalid signature for player1");
-		// require(o2.player == orderid2.toEthSignedMessageHash().recover(o2.sign), "invalid signature for player2");
+		require(o1.player == orderid1.toEthSignedMessageHash().recover(o1.sign), "invalid signature for player1");
+		require(o2.player == orderid2.toEthSignedMessageHash().recover(o2.sign), "invalid signature for player2");
 
 		lock(o1.player, o1.bet); // fails if insuficient funds
 		lock(o2.player, o2.bet); // fails if insuficient funds
