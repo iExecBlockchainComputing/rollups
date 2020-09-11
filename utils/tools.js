@@ -65,7 +65,7 @@ class Match
 {
 	constructor(order1, order2)
 	{
-		const score1 = ethers.utils.bigNumberify(ethers.utils.solidityKeccak256([
+		const score1 = ethers.BigNumber.from(ethers.utils.solidityKeccak256([
 			'address',
 			'bytes32',
 			'bytes32'
@@ -75,7 +75,7 @@ class Match
 			order2.secret(),
 		]))
 
-		const score2 = ethers.utils.bigNumberify(ethers.utils.solidityKeccak256([
+		const score2 = ethers.BigNumber.from(ethers.utils.solidityKeccak256([
 			'address',
 			'bytes32',
 			'bytes32'

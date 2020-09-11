@@ -30,7 +30,7 @@ describe('EVM/OVM features', () => {
 		it ('factory deployment', async () => {
 			// Only EVM: fill the deploying wallet
 			if (process.env.MODE === 'EVM') {
-				await wallets[0].sendTransaction({ to: FACTORY.deployer, value: 5194156000000000 })
+				await wallets[0].sendTransaction({ to: FACTORY.deployer, value: FACTORY.cost })
 			}
 
 			// Deploy factory
@@ -53,10 +53,10 @@ describe('EVM/OVM features', () => {
 
 	describe('precompiles', async () => {
 		it('recover', async () => {
-			const signer    = new ethers.utils.SigningKey(ethers.utils.randomBytes(32))
+			const signer    = new ethers.Wallet.createRandom();
 			const hash      = ethers.utils.randomBytes(32)
-			const signature = ethers.utils.joinSignature(signer.signDigest(ethers.utils.hashMessage(hash)))
-			
+			const signature = ethers.utils.joinSignature(signer._signingKey().signDigest(ethers.utils.hashMessage(hash)))
+
 			expect(await Instance.recover(hash, signature)).to.equal(signer.address)
 		})
 	})
