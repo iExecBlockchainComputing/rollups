@@ -1,12 +1,16 @@
-const { MockProvider } = require('ethereum-waffle')
-const { addHandlerToProvider } = require('@eth-optimism/rollup-full-node')
+const WaffleV3 = require('ethereum-waffle')
+const Optimism = require('@eth-optimism/ovm-toolchain')
 
 const getProvider = async () => {
-	let provider = new MockProvider()
-	if (process.env.MODE === 'OVM') {
-		provider = await addHandlerToProvider(provider)
+	switch (process.env.MODE)
+	{
+		case 'OVM':
+			return new Optimism.waffleV3.MockProvider();
+
+		case 'EVM':
+		default:
+			return new WaffleV3.MockProvider();
 	}
-	return provider
 }
 
 module.exports = { getProvider }
