@@ -5,13 +5,9 @@
   "description": "iExec on optimistic roollups",
   "license": "MIT",
   "scripts": {
-    "clean": "rimraf build",
-    "build:evm": "mkdir -p build && waffle waffle-config-evm.json",
-    "test:evm": "yarn build:evm && MODE=EVM mocha 'test/*.spec.js' --timeout 10000",
-    "all:evm": "yarn clean && yarn test:evm",
-    "build:ovm": "mkdir -p build && DEBUG=info*,error*,warn* waffle waffle-config-ovm.json",
-    "test:ovm": "yarn build:ovm && MODE=OVM DEBUG=info*,warn* mocha 'test/*.spec.js' --timeout 10000",
-    "all:ovm": "yarn clean && yarn test:ovm"
+    "clean": "rimraf artifact cache",
+    "compile": "hardhat compile",
+    "test": "hardhat test"
   },
   "homepage": "https://github.com/iExecBlockchainComputing/rollups-internship#readme",
   "repository": {
@@ -19,14 +15,16 @@
     "url": "https://github.com/iExecBlockchainComputing/rollups-internship.git"
   },
   "dependencies": {
-    "@eth-optimism/ovm-toolchain": "0.0.1-alpha.2",
-    "@eth-optimism/solc": "^0.5.16-alpha.2",
-    "@iexec/solidity": "0.1.0-legacy",
-    "@openzeppelin/contracts": "2.5.1",
-    "ethereum-waffle": "^3.1.0",
-    "ethers": "^5.0.14",
-    "mocha": "^8.1.3",
-    "rimraf": "^3.0.2",
-    "solc": "0.5.16"
+    "@openzeppelin/contracts": "3.4.0-solc-0.7"
+  },
+  "devDependencies": {
+    "@eth-optimism/plugins": "0.0.16",
+    "@nomiclabs/hardhat-ethers": "^2.0.1",
+    "@nomiclabs/hardhat-waffle": "^2.0.1",
+    "chai": "^4.3.0",
+    "ethereum-waffle": "^3.3.0",
+    "ethers": "^5.0.31",
+    "hardhat": "^2.0.11",
+    "rimraf": "^3.0.2"
   }
 }

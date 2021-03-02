@@ -1,138 +1,119 @@
-const Betting = require('../build/Betting.json')
-
-const { use, expect } = require('chai')
-const { solidity, deployContract } = require('ethereum-waffle')
-const { getProvider } = require('./setup')
-
-const { ethers } = require('ethers')
+const { expect } = require('chai');
 const { Order, Match } = require('../utils/tools')
 
-use(solidity);
+
+async function deploy(name, ...params) {
+  const Contract = await ethers.getContractFactory(name);
+  return await Contract.deploy(...params).then(f => f.deployed());
+}
 
 describe('Betting smart contract', () => {
 	const BET = 1;
 
-	let provider
-	let wallets
-	let Instance
-	let order1
-	let order2
-	let match
-
-	// Setup
-
 	before(async () => {
-		provider = await getProvider()
-		wallets  = provider.getWallets()
-
-		Instance = await deployContract(wallets[0], Betting, [])
-		await Instance.airdrop(wallets[0].address, 10000)
-		await Instance.airdrop(wallets[1].address, 10000)
-		await Instance.airdrop(wallets[2].address, 10000)
+		this.wallets = await ethers.getSigners();
+		this.instance = await deploy('Betting')
+		await this.instance.airdrop(this.wallets[0].address, 10000)
+		await this.instance.airdrop(this.wallets[1].address, 10000)
+		await this.instance.airdrop(this.wallets[2].address, 10000)
 	})
 
 	beforeEach(async () => {})
 
-	// Test
-
 	describe('matchOrders', async () => {
 
 		it('prepare orders', async () => {
-			order1 = new Order(Instance, wallets[1], BET)
-			order2 = new Order(Instance, wallets[2], BET)
-			match  = new Match(order1, order2)
+			this.order1 = await Order.new(this.instance, this.wallets[1], BET)
+			this.order2 = await Order.new(this.instance, this.wallets[2], BET)
+			this.match  = new Match(this.order1, this.order2)
 		})
 
 		it('check hash', async () => {
-			expect(await Instance.hashOrder(order1.order())).to.equal(order1.hash())
-			expect(await Instance.hashOrder(order2.order())).to.equal(order2.hash())
+			expect(await this.instance.hashOrder(this.order1.order())).to.equal(this.order1.hash())
+			expect(await this.instance.hashOrder(this.order2.order())).to.equal(this.order2.hash())
 		})
 
 		it('match', async () => {
-			await expect(Instance.matchOrders(order1.order(), order2.order()))
-			.to.emit(Instance, 'Transfer').withArgs(order1.player(), Instance.address, BET)
-			.to.emit(Instance, 'Transfer').withArgs(order2.player(), Instance.address, BET)
-			.to.emit(Instance, 'GameOn'  ).withArgs(order1.player(), order1.hash(), match.id)
-			.to.emit(Instance, 'GameOn'  ).withArgs(order2.player(), order2.hash(), match.id)
+			await expect(this.instance.matchOrders(this.order1.order(), this.order2.order()))
+			.to.emit(this.instance, 'Transfer').withArgs(this.order1.player(), this.instance.address, BET)
+			.to.emit(this.instance, 'Transfer').withArgs(this.order2.player(), this.instance.address, BET)
+			.to.emit(this.instance, 'GameOn'  ).withArgs(this.order1.player(), this.order1.hash(), this.match.id)
+			.to.emit(this.instance, 'GameOn'  ).withArgs(this.order2.player(), this.order2.hash(), this.match.id)
 			.to.not.be.reverted
 		});
 
 		it('check match', async () => {
-			const details = await Instance.matches(match.id);
-			expect(details.player1 ).to.equal(order1.player())
-			expect(details.player2 ).to.equal(order2.player())
-			expect(details.commit1 ).to.equal(order1.commit())
-			expect(details.commit2 ).to.equal(order2.commit())
+			const details = await this.instance.matches(this.match.id);
+			expect(details.player1 ).to.equal(this.order1.player())
+			expect(details.player2 ).to.equal(this.order2.player())
+			expect(details.commit1 ).to.equal(this.order1.commit())
+			expect(details.commit2 ).to.equal(this.order2.commit())
 			expect(details.reveal1 ).to.equal(ethers.constants.HashZero)
 			expect(details.reveal2 ).to.equal(ethers.constants.HashZero)
 			expect(details.reward  ).to.equal(2*BET)
-			// expect(details.deadline).to.equal()
 		})
 
 		it('check balances', async () => {
-			expect(await Instance.balanceOf(order1.player())).to.equal(10000-BET)
-			expect(await Instance.balanceOf(order2.player())).to.equal(10000-BET)
-			expect(await Instance.balanceOf(Instance.address)).to.equal(2*BET)
+			expect(await this.instance.balanceOf(this.order1.player())).to.equal(10000-BET)
+			expect(await this.instance.balanceOf(this.order2.player())).to.equal(10000-BET)
+			expect(await this.instance.balanceOf(this.instance.address)).to.equal(2*BET)
 		})
 
 		it('reveal secret - player 1', async () => {
-			await expect(Instance.reveal(match.id, order1.player(), order1.secret()))
-			.to.emit(Instance, 'Reveal').withArgs(match.id, order1.player())
+			await expect(this.instance.reveal(this.match.id, this.order1.player(), this.order1.secret()))
+			.to.emit(this.instance, 'Reveal').withArgs(this.match.id, this.order1.player())
 			.to.not.be.reverted
 		})
 
 		it('check match', async () => {
-			const details = await Instance.matches(match.id);
-			expect(details.player1 ).to.equal(order1.player())
-			expect(details.player2 ).to.equal(order2.player())
-			expect(details.commit1 ).to.equal(order1.commit())
-			expect(details.commit2 ).to.equal(order2.commit())
-			expect(details.reveal1 ).to.equal(order1.secret())
+			const details = await this.instance.matches(this.match.id);
+			expect(details.player1 ).to.equal(this.order1.player())
+			expect(details.player2 ).to.equal(this.order2.player())
+			expect(details.commit1 ).to.equal(this.order1.commit())
+			expect(details.commit2 ).to.equal(this.order2.commit())
+			expect(details.reveal1 ).to.equal(this.order1.secret())
 			expect(details.reveal2 ).to.equal(ethers.constants.HashZero)
 			expect(details.reward  ).to.equal(2*BET)
-			// expect(details.deadline).to.equal()
 		})
 
 		it('reveal secret - player 2', async () => {
-			await expect(Instance.reveal(match.id, order2.player(), order2.secret()))
-			.to.emit(Instance, 'Reveal').withArgs(match.id, order2.player())
+			await expect(this.instance.reveal(this.match.id, this.order2.player(), this.order2.secret()))
+			.to.emit(this.instance, 'Reveal').withArgs(this.match.id, this.order2.player())
 			.to.not.be.reverted
 		})
 
 		it('check match', async () => {
-			const details = await Instance.matches(match.id);
-			expect(details.player1 ).to.equal(order1.player())
-			expect(details.player2 ).to.equal(order2.player())
-			expect(details.commit1 ).to.equal(order1.commit())
-			expect(details.commit2 ).to.equal(order2.commit())
-			expect(details.reveal1 ).to.equal(order1.secret())
-			expect(details.reveal2 ).to.equal(order2.secret())
+			const details = await this.instance.matches(this.match.id);
+			expect(details.player1 ).to.equal(this.order1.player())
+			expect(details.player2 ).to.equal(this.order2.player())
+			expect(details.commit1 ).to.equal(this.order1.commit())
+			expect(details.commit2 ).to.equal(this.order2.commit())
+			expect(details.reveal1 ).to.equal(this.order1.secret())
+			expect(details.reveal2 ).to.equal(this.order2.secret())
 			expect(details.reward  ).to.equal(2*BET)
-			// expect(details.deadline).to.equal()
 		})
 
 		it('finalize', async () => {
-			await expect(Instance.finalize(match.id))
-			.to.emit(Instance, 'Transfer').withArgs(Instance.address, match.winner, 2*BET)
+			await expect(this.instance.finalize(this.match.id))
+			.to.emit(this.instance, 'Transfer').withArgs(this.instance.address, this.match.winner, 2*BET)
 			.to.not.be.reverted
 		})
 
 		it('check match', async () => {
-			const details = await Instance.matches(match.id);
-			expect(details.player1 ).to.equal(order1.player())
-			expect(details.player2 ).to.equal(order2.player())
-			expect(details.commit1 ).to.equal(order1.commit())
-			expect(details.commit2 ).to.equal(order2.commit())
-			expect(details.reveal1 ).to.equal(order1.secret())
-			expect(details.reveal2 ).to.equal(order2.secret())
+			const details = await this.instance.matches(this.match.id);
+			expect(details.player1 ).to.equal(this.order1.player())
+			expect(details.player2 ).to.equal(this.order2.player())
+			expect(details.commit1 ).to.equal(this.order1.commit())
+			expect(details.commit2 ).to.equal(this.order2.commit())
+			expect(details.reveal1 ).to.equal(this.order1.secret())
+			expect(details.reveal2 ).to.equal(this.order2.secret())
 			expect(details.reward  ).to.equal(0)
-			// expect(details.deadline).to.equal()
 		})
 
 		it('check balances', async () => {
-			expect(await Instance.balanceOf(order1.player())).to.equal(10000 + (match.winner==order1.player() ? +BET : -BET))
-			expect(await Instance.balanceOf(order2.player())).to.equal(10000 + (match.winner==order2.player() ? +BET : -BET))
-			expect(await Instance.balanceOf(Instance.address)).to.equal(0)
+			expect(await this.instance.balanceOf(this.order1.player())).to.equal(10000 + (this.match.winner == this.order1.player() ? +BET : -BET))
+			expect(await this.instance.balanceOf(this.order2.player())).to.equal(10000 + (this.match.winner == this.order2.player() ? +BET : -BET))
+			expect(await this.instance.balanceOf(this.instance.address)).to.equal(0)
 		})
 	});
 });

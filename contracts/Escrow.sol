@@ -1,13 +1,13 @@
-pragma solidity ^0.5.16;
+pragma solidity ^0.7.0;
 pragma experimental ABIEncoderV2;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import "@openzeppelin/contracts/token/ERC20/ERC20Detailed.sol";
+import "@openzeppelin/contracts/utils/Address.sol";
 
 
-contract Escrow is ERC20, ERC20Detailed
+abstract contract Escrow is ERC20
 {
-	function receive()
+	receive()
 	external payable
 	{
 		_mint(_msgSender(), msg.value);
@@ -23,8 +23,7 @@ contract Escrow is ERC20, ERC20Detailed
 	external
 	{
 		_burn(_msgSender(), amount);
-		(bool success, bytes memory returndata) = _msgSender().call.value(amount)('');
-		require(success, string(returndata));
+		Address.sendValue(_msgSender(), amount);
 	}
 
 	function lock(address user, uint256 amount)

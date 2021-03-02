@@ -1,33 +1,19 @@
-const Testing = require('../build/Testing.json')
-const FACTORY = require('@iexec/solidity/deployment/factory.json')
+const FACTORY = require('../deployment/factory.json')
 
-const GenericFactory = require('../build/GenericFactory.json')
+const { expect } = require('chai');
 
-const { use, expect } = require('chai')
-const { solidity, deployContract } = require('ethereum-waffle')
-const { getProvider } = require('./setup')
-
-const { ethers } = require('ethers')
-const { Order, Match } = require('../utils/tools')
-
-use(solidity);
+async function deploy(name, ...params) {
+  const Contract = await ethers.getContractFactory(name);
+  return await Contract.deploy(...params).then(f => f.deployed());
+}
 
 describe('EVM/OVM features', () => {
-	let provider
-	let wallets
-	let instance
-
-	// Setup
-
 	before(async () => {
-		provider = await getProvider()
-		wallets  = provider.getWallets()
-		// instance = await deployContract(wallets[0], Testing, [])
+		this.wallets = await ethers.getSigners();
 	})
 
 	beforeEach(async () => {})
 
-	// Test
 	describe('EIP-155', async () => {
 		it ('factory deployment', async () => {
 			// ovm version of the factory
@@ -37,25 +23,26 @@ describe('EVM/OVM features', () => {
 
 			// don't fill the deploying wallet for OVM
 			if (process.env.MODE !== 'OVM') {
-				await wallets[0].sendTransaction({ to: FACTORY.deployer, value: FACTORY.cost })
+				await this.wallets[0].sendTransaction({ to: FACTORY.deployer, value: FACTORY.cost })
 			}
 
 			// Deploy factory
-			await provider.send('eth_sendRawTransaction', [ FACTORY.tx ])
+			await ethers.provider.send('eth_sendRawTransaction', [ FACTORY.tx ])
 
 			// checks
-			expect(ethers.utils.keccak256(await provider.send('eth_getCode', [ FACTORY.address ])))
-			.to.equal(process.env.MODE === 'EVM' ? '0xa8ca8e2cb0b841a4239cea8886b1c912ac194ebb0e953e5ac2710dc8d0b083c7' : '0x0aa01de5bb73ce529858cb533eb2d356f4a00686ecf31efdcc65fb3f8a7e60d7')
+			expect(ethers.utils.keccak256(await ethers.provider.send('eth_getCode', [ FACTORY.address ])))
+			.to.equal(process.env.MODE === 'OVM' ? '0x0aa01de5bb73ce529858cb533eb2d356f4a00686ecf31efdcc65fb3f8a7e60d7' : '0xa8ca8e2cb0b841a4239cea8886b1c912ac194ebb0e953e5ac2710dc8d0b083c7')
 		})
 
 		it ('factory usage', async () => {
-			const factory  = new ethers.Contract(FACTORY.address, FACTORY.abi, wallets[0])
+			const Testing  = await ethers.getContractFactory('Testing')
+			const factory  = new ethers.Contract(FACTORY.address, FACTORY.abi, this.wallets[0])
 			const salt     = ethers.utils.randomBytes(32)
-			const expected = await factory.predictAddress('0x'+Testing.bytecode, salt)
+			const expected = await factory.predictAddress(Testing.bytecode, salt)
 
-			await expect(factory.createContract('0x'+Testing.bytecode, salt)).to.emit(factory, 'NewContract').withArgs(expected)
+			await expect(factory.createContract(Testing.bytecode, salt)).to.emit(factory, 'NewContract').withArgs(expected)
 
-			instance = new ethers.Contract(expected, Testing.abi, wallets[0])
+			this.instance = new ethers.Contract(expected, Testing.interface, this.wallets[0])
 		})
 	})
 
@@ -63,9 +50,8 @@ describe('EVM/OVM features', () => {
 		it('recover', async () => {
 			const signer    = new ethers.Wallet.createRandom();
 			const hash      = ethers.utils.randomBytes(32)
-			const signature = ethers.utils.joinSignature(signer._signingKey().signDigest(ethers.utils.hashMessage(hash)))
-
-			expect(await instance.recover(hash, signature)).to.equal(signer.address)
+			const signature = await signer.signMessage(ethers.utils.arrayify(hash))
+			expect(await this.instance.recover(hash, signature)).to.equal(signer.address)
 		})
 	})
 });

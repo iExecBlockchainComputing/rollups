@@ -1,4 +1,4 @@
-pragma solidity ^0.5.16;
+pragma solidity ^0.7.0;
 pragma experimental ABIEncoderV2;
 
 import "@openzeppelin/contracts/cryptography/ECDSA.sol";
@@ -37,7 +37,7 @@ contract Betting is EscrowDev
 	event Reveal(bytes32 indexed gameid, address player);
 
 	constructor()
-	public ERC20Detailed("Layer2 Betting", "L2B", 18)
+	ERC20("Layer2 Betting", "L2B")
 	{
 	}
 
@@ -67,7 +67,7 @@ contract Betting is EscrowDev
 		m.commit1  = o1.commit;
 		m.commit2  = o2.commit;
 		m.reward   = o1.bet + o2.bet; // safe math ?
-		m.deadline = now + 1 days;
+		m.deadline = block.timestamp + 1 days;
 
 		emit GameOn(o1.player, orderid1, gameid);
 		emit GameOn(o2.player, orderid2, gameid);
@@ -77,7 +77,7 @@ contract Betting is EscrowDev
 	public
 	{
 		Match storage m = matches[gameid];
-		require(m.deadline >= now, "game is over");
+		require(m.deadline >= block.timestamp, "game is over");
 		if (player == m.player1)
 		{
 			require(m.commit1 == keccak256(abi.encodePacked(secret)), "invalid secret for player1");
@@ -100,7 +100,7 @@ contract Betting is EscrowDev
 	public
 	{
 		Match storage m = matches[gameid];
-		require(m.deadline < now, "game is still on");
+		require(m.deadline < block.timestamp, "game is still on");
 		require(m.reveal1 == bytes32(0) || m.reveal2 == bytes32(0));
 
 
@@ -126,10 +126,10 @@ contract Betting is EscrowDev
 		Match storage m = matches[gameid];
 		require(m.reveal1 != bytes32(0) && m.reveal2 != bytes32(0));
 
-		uint256 score1 = uint256(keccak256(abi.encodePacked(m.player1, m.reveal1, m.reveal2)));
-		uint256 score2 = uint256(keccak256(abi.encodePacked(m.player2, m.reveal1, m.reveal2)));
+		uint256 random = uint256(keccak256(abi.encodePacked(m.reveal1, m.reveal2)));
+		address winner = random & 0x1 == 0 ? m.player1 : m.player2;
 
-		unlock(score1 > score2 ? m.player1 : m.player2, m.reward);
+		unlock(winner, m.reward);
 		m.reward = 0; // prevent multiple rewards
 	}
 

@@ -8,17 +8,16 @@ class Order
 	// #secret;
 	// #order;
 
-	constructor(contract, account, bet, secret = this.random(32))
+	constructor(contract, signer, bet, secret)
 	{
 		this._contract = contract
-		this._signer   = new ethers.utils.SigningKey(account.privateKey)
+		this._signer   = signer
 		this._secret   = secret
 		this._order    = {
-			player: account.address,
+			player: signer.address,
 			commit: ethers.utils.keccak256(secret),
 			bet,
 		}
-		this.sign()
 	}
 
 	order () { return this._order        }
@@ -26,11 +25,6 @@ class Order
 	commit() { return this._order.commit }
 	bet   () { return this._order.bet    }
 	secret() { return this._secret       }
-
-	random(length)
-	{
-		return ethers.utils.hexlify(ethers.utils.randomBytes(length))
-	}
 
 	hash()
 	{
@@ -49,15 +43,23 @@ class Order
 
 	sign()
 	{
-		this._order.sign = ethers.utils.joinSignature(
-			this._signer.signDigest(
-				ethers.utils.hashMessage(
-					ethers.utils.arrayify(
-						this.hash()
-					)
-				)
-			)
-		)
+		return new Promise((resolve, reject) => {
+			this._signer.signMessage(ethers.utils.arrayify(this.hash()))
+			.then(sign => {
+				this._order.sign = sign;
+				resolve(sign);
+			})
+			.catch(reject);
+		});
+	}
+
+	static new(contract, signer, bet, secret = ethers.utils.hexlify(ethers.utils.randomBytes(32))) {
+		return new Promise((resolve, reject) => {
+			let order = new Order(contract, signer, bet, secret);
+			order.sign()
+			.then(_ => resolve(order))
+			.catch(reject)
+		});
 	}
 }
 
@@ -65,29 +67,15 @@ class Match
 {
 	constructor(order1, order2)
 	{
-		const score1 = ethers.BigNumber.from(ethers.utils.solidityKeccak256([
-			'address',
-			'bytes32',
-			'bytes32'
-		],[
-			order1.player(),
-			order1.secret(),
-			order2.secret(),
-		]))
-
-		const score2 = ethers.BigNumber.from(ethers.utils.solidityKeccak256([
-			'address',
-			'bytes32',
-			'bytes32'
-		],[
-			order2.player(),
-			order1.secret(),
-			order2.secret(),
-		]))
-
 		this.order1 = order1
 		this.order2 = order2
-		this.winner = score1.gt(score2) ? order1.player() : order2.player()
+		this.winner = ethers.BigNumber.from(ethers.utils.solidityKeccak256([
+			'bytes32',
+			'bytes32'
+		],[
+			order1.secret(),
+			order2.secret(),
+		])).mod(2).isZero() ? order1.player() : order2.player()
 		this.id     = ethers.utils.solidityKeccak256([
 			'bytes32',
 			'bytes32',

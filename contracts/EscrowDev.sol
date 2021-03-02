@@ -1,10 +1,10 @@
-pragma solidity ^0.5.16;
+pragma solidity ^0.7.0;
 pragma experimental ABIEncoderV2;
 
 import "./Escrow.sol";
 
 
-contract EscrowDev is Escrow
+abstract contract EscrowDev is Escrow
 {
 	function airdrop(address receiver, uint256 amount)
 	external
