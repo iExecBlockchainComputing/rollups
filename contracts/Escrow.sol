@@ -2,7 +2,7 @@ pragma solidity ^0.7.0;
 pragma experimental ABIEncoderV2;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import "@openzeppelin/contracts/utils/Address.sol";
+// import "@openzeppelin/contracts/utils/Address.sol";
 
 
 abstract contract Escrow is ERC20
@@ -23,7 +23,9 @@ abstract contract Escrow is ERC20
 	external
 	{
 		_burn(_msgSender(), amount);
-		Address.sendValue(_msgSender(), amount);
+		// Address.sendValue(_msgSender(), amount);
+		(bool success, ) = _msgSender().call{ value: amount }("");
+		require(success, "Address: unable to send value, recipient may have reverted");
 	}
 
 	function lock(address user, uint256 amount)

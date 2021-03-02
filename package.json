@@ -5,9 +5,11 @@
   "description": "iExec on optimistic roollups",
   "license": "MIT",
   "scripts": {
-    "clean": "rimraf artifact cache",
+    "clean": "rimraf artifacts cache",
     "compile": "hardhat compile",
-    "test": "hardhat test"
+    "test:evm": "MODE=EVM hardhat test",
+    "test:ovm": "MODE=OVM hardhat test",
+    "test": "npm run test:evm && npm run test:ovm"
   },
   "homepage": "https://github.com/iExecBlockchainComputing/rollups-internship#readme",
   "repository": {
